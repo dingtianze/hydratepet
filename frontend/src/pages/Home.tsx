@@ -6,6 +6,7 @@ import { usePetStore } from '@stores/petStore';
 import { useUserStore } from '@stores/userStore';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { ShareCard } from '@components/ShareCard';
 
 export function Home() {
   const { todayAmount, dailyGoal, isGoalReached } = useWaterStore();
@@ -147,20 +148,13 @@ export function Home() {
               >
                 🏆 查看称号
               </Link>
-              <button
-                onClick={() => {
-                  const shareText = `我在 HydratePet 今日饮水目标达成！喝了 ${todayAmount}ml，我的宠物很开心~ 🎉💧`;
-                  if (navigator.share) {
-                    navigator.share({ title: 'HydratePet', text: shareText });
-                  } else {
-                    navigator.clipboard.writeText(shareText);
-                    alert('已复制到剪贴板！');
-                  }
-                }}
-                className="px-4 py-2 bg-water-500 text-white rounded-lg text-sm font-medium hover:bg-water-600 transition-colors"
-              >
-                📤 分享
-              </button>
+              <ShareCard
+                petName={pet?.name || '小水滴'}
+                petStage={pet?.stage || 'egg'}
+                todayAmount={todayAmount}
+                goalReached={isGoalReached()}
+                streakDays={0}
+              />
             </div>
           </div>
         </section>
