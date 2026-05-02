@@ -1,0 +1,188 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: 79 70 229;
+    --color-water: 14 165 233;
+  }
+
+  * {
+    @apply box-border;
+  }
+
+  html {
+    @apply antialiased scroll-smooth;
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900 font-sans;
+    @apply dark:bg-gray-900 dark:text-gray-100;
+  }
+
+  #root {
+    @apply min-h-screen flex flex-col;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-all duration-200;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+
+  .btn-primary {
+    @apply btn bg-primary-600 text-white hover:bg-primary-700;
+    @apply focus:ring-primary-500;
+  }
+
+  .btn-secondary {
+    @apply btn bg-gray-200 text-gray-800 hover:bg-gray-300;
+    @apply focus:ring-gray-500;
+    @apply dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600;
+  }
+
+  .btn-water {
+    @apply btn bg-water-500 text-white hover:bg-water-600;
+    @apply focus:ring-water-500;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-100;
+    @apply dark:bg-gray-800 dark:border-gray-700;
+  }
+
+  .input {
+    @apply w-full px-4 py-2 rounded-lg border border-gray-300;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    @apply dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100;
+  }
+
+  .progress-ring {
+    @apply relative;
+  }
+
+  .pixel-text {
+    @apply font-mono tracking-wide;
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
+  }
+
+  /* Pixel UI Components */
+  .pixel-border {
+    border-style: solid;
+    border-width: 2px;
+    border-image-slice: 2;
+    border-image-width: 2;
+    border-image-repeat: stretch;
+    border-image-source: linear-gradient(to bottom right, rgba(0,0,0,0.2), rgba(0,0,0,0.1));
+    box-shadow: 
+      inset -2px -2px 0 rgba(0,0,0,0.1),
+      inset 2px 2px 0 rgba(255,255,255,0.3),
+      2px 2px 0 rgba(0,0,0,0.1);
+  }
+
+  .pixel-card {
+    @apply rounded-none;
+    border: 2px solid;
+    border-color: rgba(0,0,0,0.1);
+    box-shadow: 
+      4px 4px 0 rgba(0,0,0,0.1),
+      inset -1px -1px 0 rgba(0,0,0,0.05),
+      inset 1px 1px 0 rgba(255,255,255,0.5);
+    image-rendering: pixelated;
+  }
+
+  .pixel-btn {
+    @apply rounded-none font-bold uppercase tracking-wider;
+    box-shadow: 
+      4px 4px 0 rgba(0,0,0,0.2),
+      inset -2px -2px 0 rgba(0,0,0,0.2),
+      inset 2px 2px 0 rgba(255,255,255,0.3);
+    transition: all 0.1s ease;
+  }
+
+  .pixel-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 
+      2px 2px 0 rgba(0,0,0,0.2),
+      inset -2px -2px 0 rgba(0,0,0,0.2),
+      inset 2px 2px 0 rgba(255,255,255,0.3);
+  }
+
+  .pixel-btn-sm {
+    @apply rounded-none;
+    box-shadow: 
+      2px 2px 0 rgba(0,0,0,0.2),
+      inset -1px -1px 0 rgba(0,0,0,0.1),
+      inset 1px 1px 0 rgba(255,255,255,0.3);
+  }
+
+  .pixel-icon {
+    @apply inline-flex items-center justify-center;
+    image-rendering: pixelated;
+  }
+}
+
+@layer utilities {
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-area-x {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Animation for water drop */
+@keyframes drop {
+  0% {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+}
+
+.animate-drop {
+  animation: drop 1s ease-in-out infinite;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-400 rounded-full;
+  @apply hover:bg-gray-500;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-500;
+}
+
+/* Hide scrollbar for mobile PWA */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

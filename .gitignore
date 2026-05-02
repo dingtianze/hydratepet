@@ -43,3 +43,7 @@ coverage/
 .cache/
 .temp/
 tmp/
+
+# External tools
+hermes-web-ui-main/
+*.zip

@@ -1,0 +1,216 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// 用户表
+model User {
+  id            String   @id @default(uuid())
+  authType      String   @map("auth_type")
+  phone         String?  @unique
+  wechatOpenid  String?  @unique @map("wechat_openid")
+  nickname      String
+  avatarUrl     String?  @map("avatar_url")
+  weight        Int
+  gender        String
+  workStart     String   @default("09:00") @map("work_start")
+  workEnd       String   @default("18:00") @map("work_end")
+  dailyGoal     Int      @default(1500) @map("daily_goal")
+  pushToken     String?  @map("push_token")
+  timezone      String   @default("Asia/Shanghai")
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+
+  // 关联
+  pet               Pet?
+  waterRecords      WaterRecord[]
+  userBadges        UserBadge[]
+  userTitles        UserTitle[]
+  dailySummaries    DailySummary[]
+  reminderConfig    ReminderConfig?
+  pushSubscriptions PushSubscription[]
+
+  @@map("users")
+  @@index([phone])
+  @@index([wechatOpenid])
+  @@index([isActive])
+}
+
+// 宠物表
+model Pet {
+  id            String   @id @default(uuid())
+  userId        String   @unique @map("user_id")
+  name          String   @default("小水滴")
+  stage         String   @default("egg")
+  growth        Int      @default(0)
+  bodyType      String?  @map("body_type")
+  colorPalette  String?  @map("color_palette") @default("[\"#4ECDC4\", \"#FFE66D\"]")
+  accessories   String   @default("[]")
+  mood          String   @default("happy")
+  health        Int      @default(100)
+  lastFed       DateTime? @map("last_fed")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+
+  // 关联
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("pets")
+  @@index([userId])
+  @@index([stage])
+}
+
+// 饮水记录表
+model WaterRecord {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  amount      Int
+  timestamp   DateTime
+  recordType  String   @default("quick") @map("record_type")
+  note        String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // 关联
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("water_records")
+  @@index([userId, timestamp])
+  @@index([timestamp])
+}
+
+// 每日汇总表
+model DailySummary {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  date         DateTime
+  totalAmount  Int      @default(0) @map("total_amount")
+  goalReached  Boolean  @default(false) @map("goal_reached")
+  streakDays   Int      @default(0) @map("streak_days")
+  recordCount  Int      @default(0) @map("record_count")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+
+  // 关联
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@map("daily_summaries")
+  @@index([userId, date])
+  @@index([date])
+}
+
+// 提醒配置表
+model ReminderConfig {
+  id                  String   @id @default(uuid())
+  userId              String   @unique @map("user_id")
+  enabled             Boolean  @default(true)
+  intervals           String   @default("[\"09:30\",\"11:00\",\"14:00\",\"16:00\",\"17:00\"]") @map("intervals")
+  workdaysOnly        Boolean  @default(false) @map("workdays_only")
+  quietHoursStart     String   @default("22:00") @map("quiet_hours_start")
+  quietHoursEnd       String   @default("08:00") @map("quiet_hours_end")
+  soundEnabled        Boolean  @default(true) @map("sound_enabled")
+  vibrationEnabled    Boolean  @default(true) @map("vibration_enabled")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @default(now()) @updatedAt @map("updated_at")
+
+  // 关联
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("reminder_configs")
+}
+
+// 推送订阅表
+model PushSubscription {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  // 关联
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("push_subscriptions")
+  @@index([userId])
+}
+
+// 徽章定义表
+model BadgeDef {
+  id              String   @id @default(uuid())
+  key             String   @unique
+  name            String
+  description     String?
+  iconUrl         String?  @map("icon_url")
+  rarity          String
+  conditionType   String   @map("condition_type")
+  conditionValue  String   @map("condition_value")
+  sortOrder       Int      @default(0) @map("sort_order")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  // 关联
+  userBadges UserBadge[]
+
+  @@map("badge_defs")
+}
+
+// 用户徽章表
+model UserBadge {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  badgeId     String   @map("badge_id")
+  unlockedAt  DateTime @default(now()) @map("unlocked_at")
+
+  // 关联
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badgeDef BadgeDef @relation(fields: [badgeId], references: [id])
+
+  @@unique([userId, badgeId])
+  @@map("user_badges")
+  @@index([userId])
+}
+
+// 称号定义表
+model TitleDef {
+  id              String   @id @default(uuid())
+  key             String   @unique
+  name            String
+  description     String?
+  icon            String?
+  category        String
+  conditionType   String   @map("condition_type")
+  conditionValue  String   @map("condition_value")
+  sortOrder       Int      @default(0) @map("sort_order")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  // 关联
+  userTitles UserTitle[]
+
+  @@map("title_defs")
+}
+
+// 用户称号表
+model UserTitle {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  titleId     String   @map("title_id")
+  unlockedAt  DateTime @default(now()) @map("unlocked_at")
+  isActive    Boolean  @default(false) @map("is_active")
+
+  // 关联
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  titleDef TitleDef @relation(fields: [titleId], references: [id])
+
+  @@unique([userId, titleId])
+  @@map("user_titles")
+  @@index([userId])
+}
