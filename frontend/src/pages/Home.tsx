@@ -1,6 +1,6 @@
 import { WaterProgress } from '@components/WaterProgress';
 import { QuickAddWater } from '@components/QuickAddWater';
-import { PetAvatar } from '@components/PetAvatar';
+import { PetAvatar } from '@components/pet/PetAvatar';
 import { useWaterStore } from '@stores/waterStore';
 import { usePetStore } from '@stores/petStore';
 import { useUserStore } from '@stores/userStore';
@@ -10,8 +10,14 @@ import { ShareCard } from '@components/ShareCard';
 
 export function Home() {
   const { todayAmount, dailyGoal, isGoalReached } = useWaterStore();
-  const { pet } = usePetStore();
+  const { pet, interactWithPet } = usePetStore();
   const { user } = useUserStore();
+
+  const handleInteract = () => {
+    if (pet) {
+      interactWithPet();
+    }
+  };
 
   // Check pet hydration status periodically
   useEffect(() => {
@@ -53,7 +59,7 @@ export function Home() {
 
       {/* Pet Section */}
       <section className="card p-6">
-        <PetAvatar size="lg" />
+        <PetAvatar pet={pet} size="lg" onInteract={handleInteract} />
         
         {/* Pet health indicator */}
         {pet && (

@@ -47,3 +47,4 @@ tmp/
 # External tools
 hermes-web-ui-main/
 *.zip
+generate-icons.js

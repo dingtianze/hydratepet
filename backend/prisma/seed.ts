@@ -222,7 +222,7 @@ async function main() {
         data: {
           userId: user.id,
           enabled: true,
-          intervals: ['09:30', '11:00', '14:00', '16:00', '17:00'],
+          intervals: JSON.stringify(['09:30', '11:00', '14:00', '16:00', '17:00']),
         },
       });
 

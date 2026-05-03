@@ -1,5 +1,5 @@
 import { usePetStore } from '@stores/petStore';
-import { PetAvatar } from '@components/PetAvatar';
+import { PetAvatar } from '@components/pet/PetAvatar';
 import { useState } from 'react';
 import type { PetType } from '../types/index';
 
@@ -12,10 +12,22 @@ const PET_TYPES: { type: PetType; label: string; emoji: string; desc: string }[]
 ];
 
 export function Pet() {
-  const { pet, setPet, toggleSleep } = usePetStore();
+  const { pet, setPet, toggleSleep, feedPet, interactWithPet } = usePetStore();
   const [isCreating, setIsCreating] = useState(false);
   const [newPetName, setNewPetName] = useState('');
   const [selectedType, setSelectedType] = useState<PetType>('cat');
+
+  const handleInteract = () => {
+    if (pet) {
+      interactWithPet();
+    }
+  };
+
+  const handleFeed = () => {
+    if (pet) {
+      feedPet(50);
+    }
+  };
 
   const handleCreatePet = () => {
     if (!newPetName.trim()) return;
@@ -130,11 +142,17 @@ export function Pet() {
       {/* Pet Avatar Card */}
       <div className="card p-6">
         <div className="flex justify-center">
-          <PetAvatar size="xl" />
+          <PetAvatar pet={pet} size="xl" onInteract={handleInteract} />
         </div>
 
         {/* Action buttons */}
         <div className="mt-6 flex gap-3 justify-center">
+          <button
+            onClick={handleFeed}
+            className="bg-green-500 text-white hover:bg-green-600 btn"
+          >
+            🍎 喂食
+          </button>
           <button
             onClick={toggleSleep}
             className={`btn ${

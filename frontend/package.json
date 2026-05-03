@@ -14,12 +14,12 @@
   },
   "dependencies": {
     "framer-motion": "^12.38.0",
+    "html2canvas": "^1.4.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.22.3",
     "zustand": "^4.5.2",
-    "zustand-persist": "^0.1.6",
-    "html2canvas": "^1.4.1"
+    "zustand-persist": "^0.1.6"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",

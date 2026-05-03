@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { api } from '@services/api';
+import { shareApi } from '@services/api';
 
 interface ShareCardProps {
   petName: string;
@@ -26,7 +26,7 @@ export function ShareCard({ petName, petStage, todayAmount, goalReached, streakD
     setShowCard(true);
     setGenerating(true);
     try {
-      await api.share.generate();
+      await shareApi.generate();
     } catch (e) {
       console.error(e);
     } finally {

@@ -39,6 +39,8 @@ interface PetState {
   error: string | null;
   hasSeenHatch: boolean;
   isHatching: boolean;
+  isEvolving: boolean;
+  pendingStage: PetStage | null;
 
   // Actions
   setPet: (pet: Pet | null) => void;
@@ -48,6 +50,8 @@ interface PetState {
   setAchievements: (achievements: Achievement[]) => void;
   setHasSeenHatch: (value: boolean) => void;
   setIsHatching: (value: boolean) => void;
+  setEvolving: (value: boolean) => void;
+  completeEvolution: () => void;
 
   // API actions
   fetchPet: () => Promise<void>;
@@ -84,6 +88,8 @@ export const usePetStore = create<PetState>()(
       error: null,
       hasSeenHatch: false,
       isHatching: false,
+      isEvolving: false,
+      pendingStage: null,
 
       setPet: (pet) => set({ pet }),
       setLoading: (value) => set({ isLoading: value }),
@@ -92,6 +98,22 @@ export const usePetStore = create<PetState>()(
       setAchievements: (achievements) => set({ achievements }),
       setHasSeenHatch: (value) => set({ hasSeenHatch: value }),
       setIsHatching: (value) => set({ isHatching: value }),
+      setEvolving: (value) => set({ isEvolving: value }),
+      completeEvolution: () =>
+        set((state) => {
+          if (!state.pet || !state.pendingStage) return state;
+          const newMaxGrowth = getMaxGrowthForStage(state.pendingStage);
+          return {
+            isEvolving: false,
+            pendingStage: null,
+            pet: {
+              ...state.pet,
+              stage: state.pendingStage,
+              maxGrowth: newMaxGrowth,
+              nextEvolution: Math.max(0, newMaxGrowth - state.pet.growth),
+            },
+          };
+        }),
 
       // Fetch pet from API
       fetchPet: async () => {
@@ -207,8 +229,31 @@ export const usePetStore = create<PetState>()(
           const newHealth = Math.min(100, state.pet.health + amount / 20);
           const growthIncrease = Math.floor(amount / 10);
           const newGrowth = state.pet.growth + growthIncrease;
+          const currentStage = state.pet.stage;
           const newStage = getPetStage(newGrowth);
           const newMaxGrowth = getMaxGrowthForStage(newStage);
+
+          // Detect evolution threshold crossing
+          const stageOrder: PetStage[] = ['egg', 'baby', 'child', 'teen', 'adult'];
+          const currentIdx = stageOrder.indexOf(currentStage);
+          const newIdx = stageOrder.indexOf(newStage);
+          const isCrossingThreshold = newIdx > currentIdx && !state.isEvolving;
+
+          if (isCrossingThreshold) {
+            return {
+              isEvolving: true,
+              pendingStage: newStage,
+              pet: {
+                ...state.pet,
+                health: newHealth,
+                growth: newGrowth,
+                maxGrowth: newMaxGrowth,
+                mood: newHealth > 70 ? 'happy' : newHealth > 40 ? 'normal' : 'thirsty',
+                lastFed: new Date().toISOString(),
+                nextEvolution: Math.max(0, newMaxGrowth - newGrowth),
+              },
+            };
+          }
 
           return {
             pet: {

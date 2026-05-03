@@ -297,3 +297,17 @@ export const notificationApi = {
 
   test: () => request<void>('/notifications/test', { method: 'POST' }),
 };
+
+// Combined API object for convenience
+export const api = {
+  auth: authApi,
+  user: userApi,
+  pet: petApi,
+  water: waterApi,
+  achievement: achievementApi,
+  titles: titlesApi,
+  share: shareApi,
+  export: exportApi,
+  notification: notificationApi,
+  token: tokenStorage,
+};
